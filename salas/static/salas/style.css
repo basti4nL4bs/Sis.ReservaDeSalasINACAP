@@ -1,0 +1,100 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #c8102e; /* Rojo INACAP */
+    border-bottom: 2px solid #c8102e;
+    padding-bottom: 10px;
+}
+
+h2, h3 {
+    color: #222;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #fafafa;
+    border-left: 4px solid #c8102e;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.error-msg {
+    color: #d9534f;
+    font-weight: bold;
+    background-color: #fdf7f7;
+    padding: 10px;
+    border: 1px solid #d9534f;
+    border-radius: 4px;
+}
+
+.btn-primary {
+    background-color: #c8102e;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.btn-primary:hover {
+    background-color: #a00d25;
+}
+
+.badge-disponible {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.badge-ocupado {
+    color: #6c757d;
+    text-decoration: line-through;
+}
+
+.link-back {
+    display: inline-block;
+    margin-top: 15px;
+    color: #555;
+    text-decoration: none;
+}
+
+.link-back:hover {
+    text-decoration: underline;
+}

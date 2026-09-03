@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>INACAP - Reserva de Salas de Estudio</title>
+    <link rel="stylesheet" href="{% static 'salas/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Reserva de Salas de Estudio</h1>
+        <p>Selecciona una sala disponible para agendar tu bloque de estudio:</p>
+
+        {% if lista_salas %}
+            <ul>
+            {% for sala in lista_salas %}
+                <li>
+                    <strong><a href="{% url 'salas:detail' sala.id %}">{{ sala.codigo }}</a></strong><br>
+                    <span>{{ sala.edificio }} — Piso {{ sala.piso }} | Capacidad: {{ sala.capacidad }} personas</span>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No hay salas de estudio habilitadas actualmente.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

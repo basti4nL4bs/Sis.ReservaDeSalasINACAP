@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Estado de Reservas - {{ salaestudio.codigo }}</title>
+    <link rel="stylesheet" href="{% static 'salas/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Estado: {{ salaestudio.codigo }}</h1>
+        <p>{{ salaestudio.edificio }} — Piso {{ salaestudio.piso }}</p>
+
+        <h3>Bloques para hoy:</h3>
+        <ul>
+        {% for bloque in salaestudio.bloques.all %}
+            <li>
+                <strong>{{ bloque.hora_inicio|time:"H:i" }} - {{ bloque.hora_fin|time:"H:i" }}</strong>:
+                {% if bloque.esta_reservado %}
+                    <span style="color: #c8102e;">Reservado por {{ bloque.estudiante_nombre }} ({{ bloque.carrera }})</span>
+                {% else %}
+                    <span class="badge-disponible">Disponible</span>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No hay bloques definidos.</li>
+        {% endfor %}
+        </ul>
+
+        <a class="btn-primary" style="display:inline-block; text-decoration:none; margin-top:10px;" href="{% url 'salas:detail' salaestudio.id %}">Reservar otro bloque</a>
+        <br>
+        <a class="link-back" href="{% url 'salas:index' %}">← Ver todas las salas</a>
+    </div>
+</body>
+</html>

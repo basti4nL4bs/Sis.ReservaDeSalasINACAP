@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservar {{ salaestudio.codigo }}</title>
+    <link rel="stylesheet" href="{% static 'salas/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ salaestudio.codigo }}</h1>
+        <p><strong>Ubicación:</strong> {{ salaestudio.edificio }} (Piso {{ salaestudio.piso }}) | <strong>Capacidad:</strong> {{ salaestudio.capacidad }} personas</p>
+
+        {% if error_message %}
+            <div class="error-msg">{{ error_message }}</div><br>
+        {% endif %}
+
+        <form action="{% url 'salas:reservar' salaestudio.id %}" method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="rut">RUT del Estudiante:</label>
+                <input type="text" id="rut" name="rut" placeholder="Ej: 12345678-9" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nombre">Nombre Completo:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required>
+            </div>
+
+            <div class="form-group">
+                <label for="carrera">Carrera:</label>
+                <input type="text" id="carrera" name="carrera" placeholder="Ej: Analista Programador">
+            </div>
+
+            <h3>Selecciona un bloque de horario:</h3>
+            {% for bloque in salaestudio.bloques.all %}
+                {% if not bloque.esta_reservado %}
+                    <div style="margin-bottom: 8px;">
+                        <input type="radio" name="bloque" id="bloque{{ forloop.counter }}" value="{{ bloque.id }}">
+                        <label for="bloque{{ forloop.counter }}">
+                            {{ bloque.hora_inicio|time:"H:i" }} - {{ bloque.hora_fin|time:"H:i" }}
+                        </label>
+                    </div>
+                {% else %}
+                    <div style="margin-bottom: 8px;">
+                        <span class="badge-ocupado">
+                            {{ bloque.hora_inicio|time:"H:i" }} - {{ bloque.hora_fin|time:"H:i" }} (Ocupado)
+                        </span>
+                    </div>
+                {% endif %}
+            {% empty %}
+                <p>No hay bloques configurados para esta sala.</p>
+            {% endfor %}
+
+            <br>
+            <input type="submit" class="btn-primary" value="Confirmar Reserva">
+        </form>
+
+        <a class="link-back" href="{% url 'salas:index' %}">← Volver al listado de salas</a>
+    </div>
+</body>
+</html>
