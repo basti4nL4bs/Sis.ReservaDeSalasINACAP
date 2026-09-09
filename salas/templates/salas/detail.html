@@ -2,62 +2,83 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Reservar {{ salaestudio.codigo }}</title>
-    <link rel="stylesheet" href="{% static 'salas/style.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ sala.nombre }} - Reserva de Salas</title>
+  <link rel="stylesheet" href="{% static 'salas/style.css' %}">
 </head>
 <body>
-    <div class="container">
-        <h1>{{ salaestudio.codigo }}</h1>
-        <p><strong>Ubicación:</strong> {{ salaestudio.edificio }} (Piso {{ salaestudio.piso }}) | <strong>Capacidad:</strong> {{ salaestudio.capacidad }} personas</p>
+  <div class="container">
+    <header class="header">
+      <a href="{% url 'salas:index' %}" class="btn btn-secondary" style="margin-bottom: 1rem;">← Volver al listado</a>
+      <h1>{{ sala.nombre }}</h1>
+      <p>{{ sala.get_tipo_display }} · Capacidad máxima: {{ sala.capacidad }} personas</p>
+    </header>
 
-        {% if error_message %}
-            <div class="error-msg">{{ error_message }}</div><br>
-        {% endif %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
 
-        <form action="{% url 'salas:reservar' salaestudio.id %}" method="post">
-            {% csrf_token %}
+    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
+      <div class="card">
+        <h2 class="card-title">Solicitar Reserva</h2>
+        <form action="{% url 'salas:reservar' sala.id %}" method="post">
+          {% csrf_token %}
+          
+          <div class="form-group">
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha" name="fecha" class="form-control" required>
+          </div>
 
-            <div class="form-group">
-                <label for="rut">RUT del Estudiante:</label>
-                <input type="text" id="rut" name="rut" placeholder="Ej: 12345678-9" required>
-            </div>
+          <div class="form-group">
+            <label for="hora_inicio">Hora Inicio</label>
+            <input type="time" id="hora_inicio" name="hora_inicio" class="form-control" required>
+          </div>
 
-            <div class="form-group">
-                <label for="nombre">Nombre Completo:</label>
-                <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required>
-            </div>
+          <div class="form-group">
+            <label for="hora_fin">Hora Término</label>
+            <input type="time" id="hora_fin" name="hora_fin" class="form-control" required>
+          </div>
 
-            <div class="form-group">
-                <label for="carrera">Carrera:</label>
-                <input type="text" id="carrera" name="carrera" placeholder="Ej: Analista Programador">
-            </div>
+          <div class="form-group">
+            <label for="motivo">Motivo o Asignatura</label>
+            <input type="text" id="motivo" name="motivo" class="form-control" placeholder="Ej: Taller de programación">
+          </div>
 
-            <h3>Selecciona un bloque de horario:</h3>
-            {% for bloque in salaestudio.bloques.all %}
-                {% if not bloque.esta_reservado %}
-                    <div style="margin-bottom: 8px;">
-                        <input type="radio" name="bloque" id="bloque{{ forloop.counter }}" value="{{ bloque.id }}">
-                        <label for="bloque{{ forloop.counter }}">
-                            {{ bloque.hora_inicio|time:"H:i" }} - {{ bloque.hora_fin|time:"H:i" }}
-                        </label>
-                    </div>
-                {% else %}
-                    <div style="margin-bottom: 8px;">
-                        <span class="badge-ocupado">
-                            {{ bloque.hora_inicio|time:"H:i" }} - {{ bloque.hora_fin|time:"H:i" }} (Ocupado)
-                        </span>
-                    </div>
-                {% endif %}
-            {% empty %}
-                <p>No hay bloques configurados para esta sala.</p>
-            {% endfor %}
-
-            <br>
-            <input type="submit" class="btn-primary" value="Confirmar Reserva">
+          <button type="submit" class="btn" style="width: 100%; margin-top: 0.5rem;">Confirmar Reserva</button>
         </form>
+      </div>
 
-        <a class="link-back" href="{% url 'salas:index' %}">← Volver al listado de salas</a>
+      <div class="card">
+        <h2 class="card-title">Próximas Reservas Agendadas</h2>
+        {% if reservas %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Horario</th>
+                <th>Usuario</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for res in reservas %}
+                <tr>
+                  <td>{{ res.fecha|date:"d/m/Y" }}</td>
+                  <td>{{ res.hora_inicio|time:"H:i" }} - {{ res.hora_fin|time:"H:i" }}</td>
+                  <td>{{ res.usuario.username }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="card-meta" style="margin-top: 1rem;">No hay reservas registradas para este espacio.</p>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </body>
 </html>

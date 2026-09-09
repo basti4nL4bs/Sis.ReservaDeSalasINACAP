@@ -2,27 +2,42 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>INACAP - Reserva de Salas de Estudio</title>
-    <link rel="stylesheet" href="{% static 'salas/style.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reserva de Salas INACAP</title>
+  <link rel="stylesheet" href="{% static 'salas/style.css' %}">
 </head>
 <body>
-    <div class="container">
-        <h1>Reserva de Salas de Estudio</h1>
-        <p>Selecciona una sala disponible para agendar tu bloque de estudio:</p>
+  <div class="container">
+    <header class="header">
+      <h1>Sistema de Reserva de Salas INACAP</h1>
+      <p>Selecciona un laboratorio, sala o auditorio para consultar disponibilidad y agendar.</p>
+    </header>
 
-        {% if lista_salas %}
-            <ul>
-            {% for sala in lista_salas %}
-                <li>
-                    <strong><a href="{% url 'salas:detail' sala.id %}">{{ sala.codigo }}</a></strong><br>
-                    <span>{{ sala.edificio }} — Piso {{ sala.piso }} | Capacidad: {{ sala.capacidad }} personas</span>
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No hay salas de estudio habilitadas actualmente.</p>
-        {% endif %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="grid">
+      {% for sala in salas %}
+        <div class="card">
+          <span class="badge">{{ sala.get_tipo_display }}</span>
+          <h2 class="card-title" style="margin-top: 0.5rem;">{{ sala.nombre }}</h2>
+          <div class="card-meta">
+            Capacidad: {{ sala.capacidad }} personas
+          </div>
+          <a href="{% url 'salas:detail' sala.id %}" class="btn">Ver disponibilidad y agendar</a>
+        </div>
+      {% empty %}
+        <div class="card" style="grid-column: 1 / -1;">
+          <p class="card-meta">No hay salas disponibles en este momento.</p>
+        </div>
+      {% endfor %}
     </div>
+  </div>
 </body>
 </html>

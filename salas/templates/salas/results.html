@@ -2,34 +2,55 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Estado de Reservas - {{ salaestudio.codigo }}</title>
-    <link rel="stylesheet" href="{% static 'salas/style.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estado de Reservas - {{ sala.nombre }}</title>
+  <link rel="stylesheet" href="{% static 'salas/style.css' %}">
 </head>
 <body>
-    <div class="container">
-        <h1>Estado: {{ salaestudio.codigo }}</h1>
-        <p>{{ salaestudio.edificio }} — Piso {{ salaestudio.piso }}</p>
-
-        <h3>Bloques para hoy:</h3>
-        <ul>
-        {% for bloque in salaestudio.bloques.all %}
-            <li>
-                <strong>{{ bloque.hora_inicio|time:"H:i" }} - {{ bloque.hora_fin|time:"H:i" }}</strong>:
-                {% if bloque.esta_reservado %}
-                    <span style="color: #c8102e;">Reservado por {{ bloque.estudiante_nombre }} ({{ bloque.carrera }})</span>
-                {% else %}
-                    <span class="badge-disponible">Disponible</span>
-                {% endif %}
-            </li>
-        {% empty %}
-            <li>No hay bloques definidos.</li>
-        {% endfor %}
-        </ul>
-
-        <a class="btn-primary" style="display:inline-block; text-decoration:none; margin-top:10px;" href="{% url 'salas:detail' salaestudio.id %}">Reservar otro bloque</a>
-        <br>
-        <a class="link-back" href="{% url 'salas:index' %}">← Ver todas las salas</a>
+  <div class="container">
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="alert alert-success" style="margin-bottom: 1rem;">
+        Operación procesada correctamente.
+      </div>
+      <h1 class="card-title" style="font-size: 1.5rem;">Historial de reservas: {{ sala.nombre }}</h1>
+      <p class="card-meta">{{ sala.get_tipo_display }} · Capacidad: {{ sala.capacidad }} personas</p>
+      
+      <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+        <a href="{% url 'salas:detail' sala.id %}" class="btn">Hacer otra reserva</a>
+        <a href="{% url 'salas:index' %}" class="btn btn-secondary">Volver al inicio</a>
+      </div>
     </div>
+
+    <div class="card">
+      <h2 class="card-title">Todas las reservas confirmadas</h2>
+      {% if reservas %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Horario</th>
+              <th>Solicitante</th>
+              <th>Motivo</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in reservas %}
+              <tr>
+                <td>{{ r.fecha|date:"d/m/Y" }}</td>
+                <td>{{ r.hora_inicio|time:"H:i" }} - {{ r.hora_fin|time:"H:i" }}</td>
+                <td>{{ r.usuario.username }}</td>
+                <td>{{ r.motivo|default:"Sin especificar" }}</td>
+                <td><span class="badge">{{ r.get_estado_display }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="card-meta" style="margin-top: 1rem;">Esta sala no registra reservas en el sistema.</p>
+      {% endif %}
+    </div>
+  </div>
 </body>
 </html>
