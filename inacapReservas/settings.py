@@ -27,7 +27,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'inacap reservas.urls'
+ROOT_URLCONF = 'inacapReservas.urls'
 
 TEMPLATES = [
     {
@@ -45,7 +45,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'inacap reservas.wsgi.application'
+WSGI_APPLICATION = 'inacapReservas.wsgi.application'
 
 DATABASES = {
     'default': {

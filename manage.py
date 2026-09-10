@@ -5,8 +5,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    # Apunta al archivo settings dentro del paquete principal
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'inacapreservas.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'inacapReservas.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

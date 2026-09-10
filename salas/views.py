@@ -1,66 +1,53 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.views import generic
-from .models import SalaEstudio, BloqueHorario
+from django.contrib import messages
+from .models import Sala, Reserva
 
-class IndexView(generic.ListView):
-    template_name = "salas/index.html"
-    context_object_name = "lista_salas"
+def index(request):
+    """Paso 1: Lista las salas disponibles."""
+    salas_disponibles = Sala.objects.filter(activa=True)
+    return render(request, 'salas/index.html', {'salas': salas_disponibles})
 
-    def get_queryset(self):
-        return SalaEstudio.objects.filter(activa=True).order_by("piso", "codigo")
+def detail(request, sala_id):
+    """Paso 2: Muestra la ficha de la sala y el formulario para agendar."""
+    sala = get_object_or_404(Sala, pk=sala_id, activa=True)
+    return render(request, 'salas/detail.html', {'sala': sala})
 
-class DetailView(generic.DetailView):
-    model = SalaEstudio
-    template_name = "salas/detail.html"
+def reservar(request, sala_id):
+    """Paso 3: Procesa el POST (igual que 'vote' en el tutorial oficial)."""
+    sala = get_object_or_404(Sala, pk=sala_id)
 
-class ResultsView(generic.DetailView):
-    model = SalaEstudio
-    template_name = "salas/results.html"
+    if request.method == 'POST':
+        fecha = request.POST.get('fecha')
+        hora_inicio = request.POST.get('hora_inicio')
+        hora_fin = request.POST.get('hora_fin')
+        motivo = request.POST.get('motivo', '')
 
-def reservar_bloque(request, sala_id):
-    sala = get_object_or_404(SalaEstudio, pk=sala_id)
-    try:
-        bloque_seleccionado = sala.bloques.get(pk=request.POST["bloque"])
-    except (KeyError, BloqueHorario.DoesNotExist):
-        return render(
-            request,
-            "salas/detail.html",
-            {
-                "salaestudio": sala,
-                "error_message": "Debes seleccionar un bloque horario válido para reservar.",
-            },
-        )
-    else:
-        if bloque_seleccionado.esta_reservado:
-            return render(
-                request,
-                "salas/detail.html",
-                {
-                    "salaestudio": sala,
-                    "error_message": "Este bloque ya fue reservado por otro estudiante.",
-                },
+        if not request.user.is_authenticated:
+            messages.error(request, "Debes iniciar sesión para agendar.")
+            return redirect('salas:detail', sala_id=sala.id)
+
+        try:
+            nueva_reserva = Reserva(
+                sala=sala,
+                usuario=request.user,
+                fecha=fecha,
+                hora_inicio=hora_inicio,
+                hora_fin=hora_fin,
+                motivo=motivo
             )
+            nueva_reserva.save() # Ejecuta el método clean() del modelo
+            # Redirección POST exitosa para evitar reenvío duplicado
+            return HttpResponseRedirect(reverse('salas:results', args=(sala.id,)))
+        except Exception as error:
+            messages.error(request, f"Error en la reserva: {error}")
+            return redirect('salas:detail', sala_id=sala.id)
 
-        rut = request.POST.get("rut", "").strip()
-        nombre = request.POST.get("nombre", "").strip()
-        carrera = request.POST.get("carrera", "").strip()
+    return redirect('salas:detail', sala_id=sala.id)
 
-        if not rut or not nombre:
-            return render(
-                request,
-                "salas/detail.html",
-                {
-                    "salaestudio": sala,
-                    "error_message": "El RUT y Nombre son obligatorios.",
-                },
-            )
-
-        bloque_seleccionado.estudiante_rut = rut
-        bloque_seleccionado.estudiante_nombre = nombre
-        bloque_seleccionado.carrera = carrera
-        bloque_seleccionado.esta_reservado = True
-        bloque_seleccionado.save()
-
-        return HttpResponseRedirect(reverse("salas:results", args=(sala.id,)))
+def results(request, sala_id):
+    """Paso 4: Muestra el resultado/historial tras reservar."""
+    sala = get_object_or_404(Sala, pk=sala_id)
+    reservas = sala.reservas.filter(estado='CONFIRMADA')
+    return render(request, 'salas/results.html', {'sala': sala, 'reservas': reservas})
