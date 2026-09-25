@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Eliminar Reserva</title>
+  <link rel="stylesheet" href="{% static 'salas/style.css' %}">
+</head>
+<body>
+  <div class="container" style="max-width: 500px;">
+    <div class="card" style="margin-top: 2rem; text-align: center;">
+      <h2 class="card-title">¿Confirmas la eliminación?</h2>
+      <p class="card-meta">Se eliminará la reserva para <strong>{{ reserva.sala.nombre }}</strong> del día {{ reserva.fecha|date:"d/m/Y" }}.</p>
+      
+      <form method="post" style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center;">
+        {% csrf_token %}
+        <button type="submit" class="btn" style="background-color: var(--error-text);">Sí, eliminar</button>
+        <a href="{% url 'salas:mis_reservas' %}" class="btn btn-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

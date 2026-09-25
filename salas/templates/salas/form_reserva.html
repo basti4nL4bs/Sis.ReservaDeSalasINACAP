@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ modo }} Reserva - {{ sala.nombre }}</title>
+  <link rel="stylesheet" href="{% static 'salas/style.css' %}">
+</head>
+<body>
+  <div class="container" style="max-width: 600px;">
+    <header class="header">
+      <a href="{% url 'salas:mis_reservas' %}" class="btn btn-secondary" style="margin-bottom: 1rem;">← Volver</a>
+      <h1>{{ modo }} Reserva: {{ sala.nombre }}</h1>
+    </header>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-error">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="card">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Guardar Reserva</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

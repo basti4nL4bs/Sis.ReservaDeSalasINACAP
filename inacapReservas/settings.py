@@ -61,3 +61,21 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Bloque Evaluacion 2: Seguridad y manejo de sesiones
+
+
+# La sesión expira al cerrar el navegador si el usuario no mantiene sesión activa
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Duración de la sesión en segundos (por ejemplo, 30 minutos de inactividad)
+SESSION_COOKIE_AGE = 1800
+
+# Protección contra robo de cookies por scripts (XSS)
+SESSION_COOKIE_HTTPONLY = True
+
+# Rutas de redirección para autenticación
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'salas:index'
+LOGOUT_REDIRECT_URL = 'salas:index'

@@ -26,7 +26,7 @@
     <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
       <div class="card">
         <h2 class="card-title">Solicitar Reserva</h2>
-        <form action="{% url 'salas:reservar' sala.id %}" method="post">
+        <form action="{% url 'salas:crear_reserva' sala.id %}" method="post">
           {% csrf_token %}
           
           <div class="form-group">

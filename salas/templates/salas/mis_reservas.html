@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mis Reservas</title>
+  <link rel="stylesheet" href="{% static 'salas/style.css' %}">
+</head>
+<body>
+  <div class="container">
+    <header class="header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h1>Mis Reservas</h1>
+        <p>Usuario: {{ request.user.username }}</p>
+      </div>
+      <div>
+        <a href="{% url 'salas:index' %}" class="btn">Ver Salas</a>
+        <a href="{% url 'logout' %}" class="btn btn-secondary">Cerrar Sesión</a>
+      </div>
+    </header>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="card">
+      {% if reservas %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Sala</th>
+              <th>Fecha</th>
+              <th>Horario</th>
+              <th>Motivo</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in reservas %}
+              <tr>
+                <td>{{ r.sala.nombre }}</td>
+                <td>{{ r.fecha|date:"d/m/Y" }}</td>
+                <td>{{ r.hora_inicio|time:"H:i" }} - {{ r.hora_fin|time:"H:i" }}</td>
+                <td>{{ r.motivo }}</td>
+                <td><span class="badge">{{ r.get_estado_display }}</span></td>
+                <td>
+                  <a href="{% url 'salas:editar_reserva' r.id %}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Editar</a>
+                  <a href="{% url 'salas:eliminar_reserva' r.id %}" class="btn" style="background-color: var(--error-text); padding: 0.25rem 0.5rem; font-size: 0.75rem;">Eliminar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="card-meta">Aún no has registrado ninguna reserva.</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
