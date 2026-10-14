@@ -1,10 +1,16 @@
+import os
 from pathlib import Path
 
+# Directorio raíz del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-inacap-reservas-dev'
-DEBUG = True
-ALLOWED_HOSTS = []
 
+SECRET_KEY = 'django-insecure-sis-reserva-salas-inacap-evaluacion-clave-secreta'
+
+DEBUG = True
+
+ALLOWED_HOSTS = ['*']
+
+# Aplicaciones instaladas
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -12,9 +18,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Registramos la app para que Django cargue sus modelos y vistas
-    'salas.apps.SalasConfig',
+    # Aplicación local del sistema
+    'salas',
+    # Django REST Framework y Tokens (Unidad 3)
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -33,7 +41,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
-        'APP_DIRS': True, # Busca dentro de salas/templates/
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -47,6 +55,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'inacapReservas.wsgi.application'
 
+# Base de datos relacional SQLite
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -54,28 +63,44 @@ DATABASES = {
     }
 }
 
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# Internacionalización
 LANGUAGE_CODE = 'es-cl'
 TIME_ZONE = 'America/Santiago'
 USE_I18N = True
 USE_TZ = True
 
+# Archivos estáticos
 STATIC_URL = 'static/'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# Bloque Evaluacion 2: Seguridad y manejo de sesiones
-
-
-# La sesión expira al cerrar el navegador si el usuario no mantiene sesión activa
+# --- SEGURIDAD Y SESIONES (Evaluación 2) ---
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-# Duración de la sesión en segundos (por ejemplo, 30 minutos de inactividad)
 SESSION_COOKIE_AGE = 1800
-
-# Protección contra robo de cookies por scripts (XSS)
 SESSION_COOKIE_HTTPONLY = True
 
-# Rutas de redirección para autenticación
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'salas:index'
+LOGIN_REDIRECT_URL = 'salas:mis_reservas'
 LOGOUT_REDIRECT_URL = 'salas:index'
+
+# --- CONFIGURACIÓN DJANGO REST FRAMEWORK (Unidad 3) ---
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+}
